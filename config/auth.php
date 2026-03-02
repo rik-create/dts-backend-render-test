@@ -112,4 +112,23 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | JWT Settings
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options determine the JWT settings.
+    |
+    | Supported settings:
+    | - jwt_secret: The secret used to sign the JWT tokens.
+    | - jwt_ttl: The number of minutes the JWT tokens are valid for.
+    | - jwt_refresh_ttl: The number of minutes the JWT refresh tokens are valid for.
+    |
+    */
+
+    'jwt_secret' => env('JWT_SECRET'),
+    'jwt_ttl' => env('JWT_TTL', 15),
+    'jwt_refresh_ttl' => env('JWT_REFRESH_TTL', 20160),
+
+
 ];
