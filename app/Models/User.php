@@ -14,19 +14,18 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
+        'user_role_id',
+        'office_id',
         'first_name',
         'last_name',
-        'middle_initial',
+        'middle_name',
         'display_name',
-        'contact_number',
         'email',
+        'username',
         'password',
+        'contact_number',
+        'is_active',
     ];
 
     /**
