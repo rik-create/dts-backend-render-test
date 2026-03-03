@@ -38,12 +38,16 @@ class UserService
 
 
         $createdUser = User::create([
+           'user_role_id' => $request['user_role_id'] ?? 1, // Fallback to 1 if not provided, assuming role 1 exists
+           'office_id' => $request['office_id'] ?? null,
            'first_name' => $request['first_name'],
-           'middle_initial' => $request['middle_initial'] ?? null,
            'last_name' => $request['last_name'],
+           'middle_name' => $request['middle_name'] ?? null,
            'display_name' => $request['display_name'] ?? null,
-           'contact_number' => $request['contact_number'] ?? null,
            'email' => $request['email'],
+           'username' => $request['username'] ?? null,
+           'contact_number' => $request['contact_number'] ?? null,
+           'is_active' => $request['is_active'] ?? true,
            'password' => Hash::make($generatedPassword),
         ]);
         return [

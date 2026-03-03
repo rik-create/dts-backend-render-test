@@ -24,12 +24,16 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_role_id' => 1, // Default to a base role, adjust as testing requires
+            // 'office_id' => 1, // Nullable by default
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'middle_initial' => strtoupper(fake()->randomLetter()),
+            'middle_name' => strtoupper(fake()->randomLetter()),
             'display_name' => fake()->userName(),
-            'contact_number' => fake()->phoneNumber(),
             'email' => fake()->unique()->safeEmail(),
+            'username' => fake()->unique()->userName(),
+            'contact_number' => fake()->phoneNumber(),
+            'is_active' => true,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
