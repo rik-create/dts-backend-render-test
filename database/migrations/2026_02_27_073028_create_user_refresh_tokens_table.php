@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('user_refresh_tokens', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            // No DB-level FK constraint here — users table is created in a later migration batch (2026_03_03).
+            // Cascade behavior is handled at the application level via model events.
+            $table->unsignedBigInteger('user_id')->index();
             $table->string('refresh_token_hash');
             $table->string('selector');
             $table->timestamp('expires_at')->nullable();

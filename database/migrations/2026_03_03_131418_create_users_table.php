@@ -13,14 +13,28 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('middle_initial')->nullable();
-            $table->string('display_name')->nullable();
-            $table->string('contact_number')->nullable();
-            $table->string('email')->unique();
+            $table->foreignId('user_role_id')->comment('Base role, finer permissions in user_group_members');
+
+            // Link to the newly created offices table (acts like campus_id in hostel)
+            $table->foreignId('office_id')->nullable()->constrained('offices')->comment('Mapped from dtsapp_profile.office_id');
+
+            // Name Fields (Mapped from auth_user & dtsapp_profile)
+            $table->string('first_name', 100)->index();
+            $table->string('last_name', 100)->index();
+            $table->string('middle_name', 100)->nullable()->comment('Mapped from dtsapp_profile');
+            $table->string('display_name', 255)->nullable();
+
+            // Login & Activity
+            $table->string('email', 255)->unique()->index();
+            $table->string('username', 150)->unique()->nullable()->comment('Mapped from auth_user for legacy login support if needed');
+            $table->string('password', 255);
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+
+            // Contact info
+            $table->string('contact_number', 100)->nullable()->comment('Mapped from dtsapp_profile');
+
+            $table->boolean('is_active')->default(true)->index()->comment('Mapped from auth_user');
+
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
