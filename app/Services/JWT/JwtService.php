@@ -8,7 +8,6 @@ use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\Clock\SystemClock;
-use DateTimeZone;
 use App\Models\User;
 use DateTimeImmutable;
 
@@ -109,6 +108,10 @@ class JwtService
              * This is the email of the user.
              */
             ->withClaim('email', $user->email)
+
+            //  ETO NA YUNG IDADAGDAG NATIN PARA SA SUPER ADMIN TO
+            ->withClaim('is_superuser', (bool) $user->is_superuser)
+           
             /**
              * Get the token.
              */

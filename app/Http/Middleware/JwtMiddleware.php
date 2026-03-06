@@ -48,6 +48,9 @@ class JwtMiddleware
             // Attach the user ID to the request
             $request->attributes->set('user_id', $token->claims()->get('sub'));
 
+            // Attach claims dito na rin para di na kailangan ng GetClaimsMiddleware
+            $request->attributes->set('jwt_claims', $token->claims()->all());
+
         // If there is an exception while parsing the token, return an unauthorized response
         } catch (\Exception $e) {
             return response()->json(['message' => 'Unauthorized'], 401);
