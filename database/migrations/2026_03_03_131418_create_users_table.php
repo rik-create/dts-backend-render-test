@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_role_id')
-            ->constrained('user_roles') 
+            ->constrained('user_roles')
             ->restrictOnDelete()
             ->comment('Base role, finer permissions in user_group_members');
             // Link to the newly created offices table (acts like campus_id in hostel)
@@ -35,7 +35,8 @@ return new class extends Migration
             // Contact info
             $table->string('contact_number', 100)->nullable()->comment('Mapped from dtsapp_profile');
 
-            $table->boolean('is_superuser')->default(false)->index();
+            $table->boolean('has_admin_access')->default(false)->index()->comment('Mapped from Django is_staff. Grants basic entry to the admin area.');
+            $table->boolean('is_superuser')->default(false)->index()->comment('Mapped from Django is_superuser. God-mode bypass for all system restrictions.');
 
             $table->boolean('is_active')->default(true)->index()->comment('Mapped from auth_user');
 
