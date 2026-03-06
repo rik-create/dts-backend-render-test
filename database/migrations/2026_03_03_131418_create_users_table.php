@@ -35,8 +35,8 @@ return new class extends Migration
             // Contact info
             $table->string('contact_number', 100)->nullable()->comment('Mapped from dtsapp_profile');
 
-            $table->boolean('is_superuser')->default(true)->index();
-            
+            $table->boolean('is_superuser')->default(false)->index();
+
             $table->boolean('is_active')->default(true)->index()->comment('Mapped from auth_user');
 
             $table->rememberToken();
