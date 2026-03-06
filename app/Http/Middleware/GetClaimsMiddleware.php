@@ -46,7 +46,8 @@ class GetClaimsMiddleware
             $claims = $token->claims()->all();
 
             // Attach the claims to the request
-            $request->merge(['claims' => $claims]);
+            // $request->merge(['claims' => $claims]);
+            $request->attributes->set('claims', $claims);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
