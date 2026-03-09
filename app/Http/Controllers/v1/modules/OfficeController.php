@@ -4,7 +4,7 @@ namespace App\Http\Controllers\v1\modules;
 
 use App\Http\Controllers\Controller;
 use App\Models\Office;
-use App\Services\OfficeService;
+use App\Services\v1\modules\OfficeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 

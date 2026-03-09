@@ -10,7 +10,7 @@ use App\Http\Requests\V1\Users\DeleteUserRequest;
 use App\Http\Requests\V1\Users\BulkDeleteUserRequest;
 use App\Http\Requests\V1\Users\BulkActivateUserRequest;
 use App\Http\Requests\V1\Users\BulkDeactivateUserRequest;
-use App\Services\UserService;
+use App\Services\v1\modules\UserService;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 

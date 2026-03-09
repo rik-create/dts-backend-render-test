@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\v1\modules;
 
 use App\Models\Office;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 
 class OfficeService
 {
@@ -30,7 +29,7 @@ class OfficeService
 
         $allowedSortColumns = ['id', 'name', 'code', 'is_active', 'created_at', 'updated_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
-             $query->orderBy($sortBy, $sortDir);
+            $query->orderBy($sortBy, $sortDir);
         }
 
         $perPage = $filters['per_page'] ?? 10;
