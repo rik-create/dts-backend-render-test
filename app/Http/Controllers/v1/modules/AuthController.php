@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\JWT\JwtService;
 use App\Services\v1\modules\AuthService;
 use Illuminate\Http\Request;
+use App\Http\Requests\V1\Auth\ForgotPasswordRequest;
+use App\Http\Requests\V1\Auth\ResetPasswordRequest;
 use App\Http\Resources\v1\modules\auth\response\LoginResource;
 use App\Http\Resources\v1\modules\auth\response\LogoutResource;
 use App\Http\Resources\v1\modules\auth\response\RefreshResource;
@@ -33,7 +35,7 @@ class AuthController extends Controller
 
         try{
              $credentials = $request->validate([
-                'email'    => 'required|email|exists:users,email',
+                'username' => 'required|string|exists:users,username',
                 'password' => 'required|string',
             ]);
 
@@ -63,7 +65,7 @@ class AuthController extends Controller
     /**
      * Logout a user
      *
-     * This eneble authorize and authenticated user to logout
+     * This enable authorize and authenticated user to logout
      *
     */
     public function logout (Request $request) {
@@ -120,6 +122,45 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
                 ], 500);
+        }
+    }
+
+    /**
+     * Send password reset link
+     * [Forgot] sends an email containing standard Laravel reset token
+     */
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        try {
+            $response = $this->service->forgotPasswordService($request->validated());
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send reset link: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset password via email token
+     * [Reset] updates the user password using the emailed token
+     */
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        try {
+            $response = $this->service->resetPasswordService($request->validated());
+            return response()->json($response, 200);
+        } catch (InvalidException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset password: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

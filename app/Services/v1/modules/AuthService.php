@@ -10,6 +10,10 @@ use Illuminate\Support\Str;
 use App\Exceptions\UnauthorizedException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 use App\Helpers\AuthHelper;
 
 class AuthService
@@ -34,10 +38,19 @@ class AuthService
     public function loginService(array $data ,$jwt)
     {
 
-        $user = User::where('email', $data['email'])->first();
+        $user = User::where('username', $data['username'])->first();
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
             throw new UnauthorizedException('Invalid credentials');
+        }
+
+        if (!$user->is_active) {
+            throw new UnauthorizedException('Your account is inactive. Please contact your administrator.');
+        }
+
+        $office = $user->office()->withTrashed()->first();
+        if ($office && ($office->trashed() || !$office->is_active)) {
+            throw new UnauthorizedException('Your assigned office is currently inactive or deleted. Please contact your administrator.');
         }
 
         $token = $jwt->generateToken($user);
@@ -119,5 +132,43 @@ class AuthService
         throw new UnauthorizedException('Invalid refresh token.');
     }
 
+    public function forgotPasswordService(array $data)
+    {
+        // TODO: In production, ensure MAIL_MAILER in .env is set to a real SMTP server (e.g., smtp, ses, mailgun) instead of 'log' to actually deliver the email.
+        $status = Password::broker()->sendResetLink(
+            ['email' => $data['email']]
+        );
 
+        if ($status !== Password::RESET_LINK_SENT && $status !== Password::INVALID_USER) {
+            throw new \Exception(__($status));
+        }
+
+        return [
+            'success' => true,
+            'message' => 'If the email exists in our records, we have emailed your password reset link.',
+        ];
+    }
+
+    public function resetPasswordService(array $data)
+    {
+        $status = Password::broker()->reset(
+            $data,
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw new InvalidException(__($status));
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Your password has been reset successfully.',
+        ];
+    }
 }
