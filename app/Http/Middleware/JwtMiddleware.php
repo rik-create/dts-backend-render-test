@@ -56,8 +56,18 @@ class JwtMiddleware
                 return response()->json(['message' => 'Invalid token'], 401);
             }
 
+            // Get user id from sub claim
+            $userId = $token->claims()->get('sub');
+
             // Attach the user ID to the request
-            $request->attributes->set('user_id', $token->claims()->get('sub'));
+            $request->attributes->set('user_id', $userId);
+
+            // Fetch the user and set as the authenticated user for the 'api' guard
+            $user = \App\Models\User::find($userId);
+            if (!$user) {
+                return response()->json(['message' => 'User not found'], 401);
+            }
+            auth('api')->setUser($user);
 
             // Attach claims dito na rin para di na kailangan ng GetClaimsMiddleware
             $request->attributes->set('jwt_claims', $token->claims()->all());
