@@ -116,6 +116,7 @@ class MigrateLegacyUsers extends Command
                 'u.password',
                 'u.is_active',
                 'u.is_superuser',
+                'u.is_staff',
                 'u.date_joined',
                 'p.middle_name',
                 'p.contact as contact_number',
@@ -148,6 +149,8 @@ class MigrateLegacyUsers extends Command
                     'password'         => $old->password,
                     'contact_number'   => $old->contact_number,
                     'is_active'        => (bool) $old->is_active,
+                    'is_superuser'     => (bool) $old->is_superuser,
+                    'has_admin_access' => (bool) $old->is_staff,
                     'created_at'       => $old->date_joined ?? now(),
                     'updated_at'       => $old->date_joined ?? now(),
                 ]

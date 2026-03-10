@@ -26,6 +26,8 @@ class User extends Authenticatable
         'password',
         'contact_number',
         'is_active',
+        'has_admin_access',
+        'is_superuser',
     ];
 
     /**
@@ -48,6 +50,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'has_admin_access' => 'boolean',
+            'is_superuser' => 'boolean',
         ];
     }
 
