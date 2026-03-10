@@ -50,4 +50,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // --- RELATIONSHIPS ---
+
+    /**
+     * Get the primary role associated with the user.
+     */
+    public function role()
+    {
+        return $this->belongsTo(UserRole::class, 'user_role_id');
+    }
+
+    /**
+     * Get the office the user is assigned to.
+     */
+    public function office()
+    {
+        return $this->belongsTo(Office::class, 'office_id');
+    }
+
+    /**
+     * The groups that belong to the user.
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(UserGroup::class, 'user_group_members', 'user_id', 'user_group_id')
+            ->withTimestamps();
+    }
 }

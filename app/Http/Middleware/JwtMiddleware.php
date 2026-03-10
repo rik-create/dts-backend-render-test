@@ -16,14 +16,25 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class JwtMiddleware
 {
+    protected $jwt;
+
+    /**
+     * Inject the JwtService via the constructor.
+     *
+     * @param \App\Services\JWT\JwtService $jwt
+     */
+    public function __construct(JwtService $jwt)
+    {
+        $this->jwt = $jwt;
+    }
+
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  \App\Services\JWT\JwtService  $jwt
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(Request $request, Closure $next, JwtService $jwt): Response
+    public function handle(Request $request, Closure $next): Response
     {
         // Get the Authorization header from the request
         $header = $request->header('Authorization');
@@ -38,10 +49,10 @@ class JwtMiddleware
 
         // Try to parse the token
         try {
-            $token = $jwt->parseToken($tokenString);
+            $token = $this->jwt->parseToken($tokenString);
 
             // If the token is invalid, return an unauthorized response
-            if (!$jwt->validateToken($token)) {
+            if (!$this->jwt->validateToken($token)) {
                 return response()->json(['message' => 'Invalid token'], 401);
             }
 
