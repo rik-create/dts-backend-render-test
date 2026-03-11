@@ -38,6 +38,13 @@ class JwtService
         $privatePath = env('JWT_PRIVATE_KEY_PATH');
         $publicPath = env('JWT_PUBLIC_KEY_PATH');
 
+        if (empty($privatePath)) {
+            $privatePath = 'storage/keys/private.key';
+        }
+        if (empty($publicPath)) {
+            $publicPath = 'storage/keys/public.key';
+        }
+
         // Resolve absolute paths if they are relative
         if (!str_starts_with($privatePath, '/')) {
             $privatePath = base_path($privatePath);
