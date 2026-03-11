@@ -23,7 +23,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy the rest of the application code
 COPY . .
 
-# Install dependencies 
+# Install dependencies
 ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
@@ -34,9 +34,11 @@ RUN composer dump-autoload --optimize
 RUN mkdir -p storage/keys
 RUN openssl genrsa -out storage/keys/private.key 2048
 RUN openssl rsa -in storage/keys/private.key -pubout -out storage/keys/public.key
+RUN openssl genrsa -out storage/keys/oauth-private.key 2048
+RUN openssl rsa -in storage/keys/oauth-private.key -pubout -out storage/keys/oauth-public.key
 RUN chmod -R 777 storage/keys
 
-# Set permissions for Laravel 
+# Set permissions for Laravel
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
 # Serve
