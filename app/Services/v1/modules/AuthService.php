@@ -40,8 +40,36 @@ class AuthService
     {
 
         $user = User::where('username', $data['username'])->first();
+        $isValid = false;
 
-        if (!$user || !Hash::check($data['password'], $user->password)) {
+        if ($user) {
+            if (str_starts_with($user->password, 'pbkdf2_sha256$')) {
+                // Decode legacy Django PBKDF2 password
+                $parts = explode('$', $user->password);
+                if (count($parts) === 4) {
+                    $iterations = (int) $parts[1];
+                    $salt = $parts[2];
+                    $hash = base64_decode($parts[3]);
+
+                    $calc = hash_pbkdf2('sha256', $data['password'], $salt, $iterations, 32, true);
+                    if (hash_equals($hash, $calc)) {
+                        $isValid = true;
+
+                        // Automatically upgrade password to Laravel Bcrypt for future logins
+                        $user->password = Hash::make($data['password']);
+                        $user->save();
+                    }
+                }
+            } else {
+                try {
+                    $isValid = Hash::check($data['password'], $user->password);
+                } catch (\Exception $e) {
+                    $isValid = false;
+                }
+            }
+        }
+
+        if (!$isValid) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
