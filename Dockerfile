@@ -41,9 +41,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Generate optimized autoload files
 RUN composer dump-autoload --optimize
 
-# Provide an entrypoint script or just use the default apache one. We will chain some cache commands.
-# Render automatically injects the PORT environment variable, Apache needs to listen to it.
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+# Disable any conflicting MPM modules and firmly enable prefork
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork
 
-# Default command
-CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground"]
+# Set ports dynamically at runtime and start Apache
+CMD sh -c "php artisan config:cache && php artisan route:cache && php artisan view:cache && sed -i \"s/Listen 80/Listen ${PORT:-80}/g\" /etc/apache2/ports.conf && sed -i \"s/:80/:${PORT:-80}/g\" /etc/apache2/sites-available/000-default.conf && apache2-foreground"
