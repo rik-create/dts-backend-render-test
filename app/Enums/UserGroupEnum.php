@@ -13,7 +13,6 @@ enum UserGroupEnum: int
 
     public static function getIdByName(string $name): int
     {
-        // Hanapin sa DB base sa name sa image_33a0fe.png
         $databaseId = UserGroup::where('name', $name)->value('id');
         
         if ($databaseId) return $databaseId;

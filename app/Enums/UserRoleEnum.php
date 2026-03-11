@@ -12,7 +12,6 @@ enum UserRoleEnum: int
 
     public static function getIdByName(string $name): int
     {
-        // Try database first
         $databaseId = UserRole::where('name', $name)->value('id');
         if ($databaseId) return $databaseId;
 
