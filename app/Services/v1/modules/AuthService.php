@@ -1,20 +1,21 @@
 <?php
 
 namespace App\Services\v1\modules;
+use App\Exceptions\InvalidException;
+use App\Exceptions\UnauthorizedException;
+use App\Helpers\AuthHelper;
 use App\Http\Resources\v1\modules\auth\MeResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\UserRefreshToken;
-use Illuminate\Support\Str;
-use App\Exceptions\UnauthorizedException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Helpers\AuthHelper;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class AuthService
 {

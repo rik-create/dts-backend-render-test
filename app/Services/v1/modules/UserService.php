@@ -14,26 +14,54 @@ class UserService
     /**
      * [Create] user record and attach default groups to support [System Enrollment]
      */
+    // public function createUser(array $data): User
+    // {
+    //     return DB::transaction(function () use ($data) {
+    //         // Determine user_role_id
+    //         // If groups is provided and contains the Office Admins group, role is Admin, else Staff
+    //         $isAdmin = isset($data['groups']) && in_array(UserGroupEnum::OFFICE_ADMINS->value, $data['groups']);
+    //         $data['user_role_id'] = $isAdmin ? UserRoleEnum::ADMIN->value : UserRoleEnum::STAFF->value;
+
+    //         // Hash the password securely
+    //         $data['password'] = Hash::make($data['password']);
+
+    //         // Create the user
+    //         $user = User::create($data);
+
+    //         // Sync groups if provided
+    //         if (isset($data['groups'])) {
+    //             $user->groups()->sync($data['groups']);
+    //         }
+
+    //         // Reload user with groups to return full data
+    //         return $user->load('groups', 'role', 'office');
+    //     });
+    // }
+
     public function createUser(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            // Determine user_role_id
-            // If groups is provided and contains the Office Admins group, role is Admin, else Staff
-            $isAdmin = isset($data['groups']) && in_array(UserGroupEnum::OFFICE_ADMINS->value, $data['groups']);
-            $data['user_role_id'] = $isAdmin ? UserRoleEnum::ADMIN->value : UserRoleEnum::STAFF->value;
+            // 1. Kunin muna ang ID ng Office Admin group nang dynamic
+            $adminGroupId = UserGroupEnum::getIdByName('Office Admins');
 
-            // Hash the password securely
+            // 2. Check kung kasama yung ID na 'yan sa piniling groups
+            $isAdmin = isset($data['groups']) && in_array($adminGroupId, $data['groups']);
+
+            // 3. I-set ang user_role_id gamit ang dynamic lookup rin sa Role
+            $data['user_role_id'] = $isAdmin 
+                ? UserRoleEnum::getIdByName('Administrator') 
+                : UserRoleEnum::getIdByName('Staff');
+
             $data['password'] = Hash::make($data['password']);
 
-            // Create the user
+            // 4. Create User
             $user = User::create($data);
 
-            // Sync groups if provided
+            // 5. Sync Groups (Membership)
             if (isset($data['groups'])) {
                 $user->groups()->sync($data['groups']);
             }
 
-            // Reload user with groups to return full data
             return $user->load('groups', 'role', 'office');
         });
     }
