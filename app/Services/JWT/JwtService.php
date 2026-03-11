@@ -35,13 +35,19 @@ class JwtService
          * The configuration is set up to use the HS256 algorithm with a secret key.
          */
 
-        $privateKey = InMemory::plainText(
-            file_get_contents(base_path(env('JWT_PRIVATE_KEY_PATH')))
-        );
+        $privatePath = env('JWT_PRIVATE_KEY_PATH');
+        $publicPath = env('JWT_PUBLIC_KEY_PATH');
 
-        $publicKey = InMemory::plainText(
-            file_get_contents(base_path(env('JWT_PUBLIC_KEY_PATH')))
-        );
+        // Resolve absolute paths if they are relative
+        if (!str_starts_with($privatePath, '/')) {
+            $privatePath = base_path($privatePath);
+        }
+        if (!str_starts_with($publicPath, '/')) {
+            $publicPath = base_path($publicPath);
+        }
+
+        $privateKey = InMemory::plainText(file_get_contents($privatePath));
+        $publicKey = InMemory::plainText(file_get_contents($publicPath));
 
         $this->config = Configuration::forAsymmetricSigner(
             new Sha256(),
@@ -111,7 +117,7 @@ class JwtService
 
             //  ETO NA YUNG IDADAGDAG NATIN PARA SA SUPER ADMIN TO
             ->withClaim('is_superuser', (bool) $user->is_superuser)
-           
+
             /**
              * Get the token.
              */

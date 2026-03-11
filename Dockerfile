@@ -23,15 +23,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy the rest of the application code
 COPY . .
 
-# Install dependencies (ignoring dev dependencies for smaller size and security)
+# Install dependencies 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Generate optimized autoload files
 RUN composer dump-autoload --optimize
 
-# Set permissions for Laravel (since CLI might run as root, we just ensure it is readable/writable)
+# Generate JWT keys right in the container
+RUN mkdir -p storage/keys
+RUN openssl genrsa -out storage/keys/private.key 2048
+RUN openssl rsa -in storage/keys/private.key -pubout -out storage/keys/public.key
+RUN chmod -R 777 storage/keys
+
+# Set permissions for Laravel 
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
-# Railway passes a dynamic PORT variable. We will use Laravel's built in server to completely bypass Apache crashes.
+# Serve
 CMD sh -c "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
